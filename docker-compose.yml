@@ -9,18 +9,15 @@ services:
         - MODULE_TAG=v0.0.1
         - MODULE_TARGET=x86_64-unknown-linux-musl
     environment:
-      - KEEPER_HOST=0.0.0.0
+      - KEEPER_HOST=keeper
       - KEEPER_PORT=3030
       - STARTING_URL=https://lemonde.fr
       - MAX_RETRIES=50
     depends_on:
       - keeper
-    restart: unless-stopped
 
   keeper:
     build:
       context: .
-      dockerfile: ./dockerfiles/keeper.Dockerfile
+      dockerfile: ./dockerfiles/keeper-debug.Dockerfile
     env_file: .env
-    ports:
-      - 3030:3030

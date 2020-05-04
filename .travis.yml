@@ -62,11 +62,13 @@ jobs:
       env: TARGET=x86_64-apple-darwin
 
 before_install:
-  - set -e
   - rustup self update
 
 install:
   - rustup target add ${TARGET}
+
+before_script:
+  - set -e
 
 script:
   - cargo build --target ${TARGET} --verbose
