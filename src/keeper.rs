@@ -29,7 +29,7 @@ impl Keeper {
             .and(warp::body::json())
             .and_then(Keeper::persist_message);
 
-        println!("Server listening on 127.0.0.1:3030");
+        println!("Server listening on 127.0.0.1:{}", self.server_port);
         warp::serve(routes)
             .run(([0, 0, 0, 0], self.server_port))
             .await;
@@ -38,7 +38,7 @@ impl Keeper {
     async fn persist_message(
         message: CrawlerResultsMessage,
     ) -> Result<impl warp::Reply, Infallible> {
-        println!("{:?}", message);
+        println!("Received results from {}", message.parent);
         Ok(warp::reply())
     }
 }
