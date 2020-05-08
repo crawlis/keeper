@@ -1,7 +1,7 @@
 mod keeper;
 
 use dotenv::dotenv;
-use keeper::{Keeper, KeeperConfig};
+use keeper::KeeperConfig;
 use std::env;
 use std::error::Error;
 use std::process;
@@ -11,12 +11,11 @@ async fn main() {
     dotenv().ok();
 
     let config = get_config().unwrap_or_else(|err| {
-        eprintln!("Problem initializing crawler config: {}", err);
+        eprintln!("Problem initializing keeper config: {}", err);
         process::exit(1);
     });
 
-    let keeper = Keeper::new(config);
-    keeper.run().await;
+    keeper::run(&config).await;
 }
 
 fn get_config() -> Result<KeeperConfig, Box<dyn Error>> {

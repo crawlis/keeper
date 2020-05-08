@@ -1,0 +1,5 @@
+CREATE TABLE nodes (
+    id SERIAL PRIMARY KEY,
+    parent VARCHAR NOT NULL,
+    value VARCHAR NOT NULL
+);
