@@ -22,7 +22,7 @@ services:
       dockerfile: ./dockerfiles/keeper-debug.Dockerfile
     env_file: .env
     environment:
-      - DATABASE_URL=postgres://postgres:password@postgres-db/keeper
+      - DATABASE_URL=postgresql://postgres:password@postgres-db/keeper
     depends_on:
       - postgres-db
 
@@ -32,3 +32,6 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=keeper
+    ports:
+      - "5432:5432"
+    restart: unless-stopped

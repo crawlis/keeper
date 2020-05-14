@@ -24,8 +24,7 @@ async fn main() {
     let keeper = Keeper::new(config);
     keeper.run().await.unwrap_or_else(|err| {
         eprintln!("Problem running the keeper: {}", err);
-        eprintln!("Terminating");
-        process::exit(1);
+        panic!("Terminating");
     });
 }
 

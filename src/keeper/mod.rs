@@ -6,6 +6,7 @@ use hyper::Server;
 use persistence::database::Database;
 use std::error::Error;
 use std::net::SocketAddr;
+use std::time;
 
 pub struct KeeperConfig {
     server_port: u16,
@@ -33,6 +34,7 @@ impl Keeper {
     pub async fn run(&self) -> Result<(), Box<dyn Error>> {
         let addr = SocketAddr::from(([0, 0, 0, 0], self.config.server_port));
         let database = Database::new(&self.config.db_url);
+        database.wait_for_conn(time::Duration::from_secs(2), 10)?;
         database.run_migrations()?;
         let make_service = make_service_fn(move |_| {
             let database = database.clone();

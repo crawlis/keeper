@@ -11,15 +11,14 @@ pub async fn routes(
             let mut response = Response::new(Body::empty());
             let body = hyper::body::to_bytes(req.into_body()).await?;
             if let Ok(node) = serde_json::from_slice(&body) as Result<NewNode, _> {
+                println!("Inserting: {:?}", node);
                 if let Ok(node) = database.insert(node).await {
                     if let Ok(node) = serde_json::to_string(&node) {
-                        eprintln!("Database error");
                         *response.status_mut() = StatusCode::OK;
                         *response.body_mut() = Body::from(node);
                         return Ok(response);
                     }
                 }
-                eprintln!("Database error");
                 *response.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
             } else {
                 *response.status_mut() = StatusCode::BAD_REQUEST;
