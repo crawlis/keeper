@@ -1,5 +1,5 @@
 use super::persistence::database::Database;
-use super::persistence::models::{NewNode, Node};
+use super::persistence::models::NewNode;
 use hyper::{Body, Method, Request, Response, StatusCode};
 
 pub async fn routes(
@@ -11,13 +11,16 @@ pub async fn routes(
             let mut response = Response::new(Body::empty());
             let body = hyper::body::to_bytes(req.into_body()).await?;
             if let Ok(node) = serde_json::from_slice(&body) as Result<NewNode, _> {
-                let node: Node = database.insert(node).await;
-                if let Ok(node) = serde_json::to_string(&node) {
-                    *response.status_mut() = StatusCode::OK;
-                    *response.body_mut() = Body::from(node);
-                } else {
-                    *response.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
+                if let Ok(node) = database.insert(node).await {
+                    if let Ok(node) = serde_json::to_string(&node) {
+                        eprintln!("Database error");
+                        *response.status_mut() = StatusCode::OK;
+                        *response.body_mut() = Body::from(node);
+                        return Ok(response);
+                    }
                 }
+                eprintln!("Database error");
+                *response.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
             } else {
                 *response.status_mut() = StatusCode::BAD_REQUEST;
             }

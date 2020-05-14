@@ -2,4 +2,4 @@
 # see diesel.rs/guides/configuring-diesel-cli
 
 [print_schema]
-file = "src/services/persistence/schema.rs"
+file = "src/keeper/persistence/schema.rs"

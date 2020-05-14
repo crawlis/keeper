@@ -21,3 +21,14 @@ services:
       context: .
       dockerfile: ./dockerfiles/keeper-debug.Dockerfile
     env_file: .env
+    environment:
+      - DATABASE_URL=postgres://postgres:password@postgres-db/keeper
+    depends_on:
+      - postgres-db
+
+  postgres-db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=keeper

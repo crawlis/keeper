@@ -1,7 +1,8 @@
 extern crate openssl;
-
 #[macro_use]
 extern crate diesel;
+#[macro_use]
+extern crate diesel_migrations;
 
 mod keeper;
 
@@ -21,7 +22,11 @@ async fn main() {
     });
 
     let keeper = Keeper::new(config);
-    keeper.run().await;
+    keeper.run().await.unwrap_or_else(|err| {
+        eprintln!("Problem running the keeper: {}", err);
+        eprintln!("Terminating");
+        process::exit(1);
+    });
 }
 
 fn get_config() -> Result<KeeperConfig, Box<dyn Error>> {

@@ -4,6 +4,7 @@ mod routing;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::Server;
 use persistence::database::Database;
+use std::error::Error;
 use std::net::SocketAddr;
 
 pub struct KeeperConfig {
@@ -29,9 +30,10 @@ impl Keeper {
         Keeper { config }
     }
 
-    pub async fn run(&self) {
+    pub async fn run(&self) -> Result<(), Box<dyn Error>> {
         let addr = SocketAddr::from(([0, 0, 0, 0], self.config.server_port));
         let database = Database::new(&self.config.db_url);
+        database.run_migrations()?;
         let make_service = make_service_fn(move |_| {
             let database = database.clone();
             async move {
@@ -44,18 +46,17 @@ impl Keeper {
 
         let server = Server::bind(&addr).serve(make_service);
 
-        // And now add a graceful shutdown signal...
         let shutdown = server.with_graceful_shutdown(shutdown_signal());
 
-        // Run this server for... forever!
         if let Err(e) = shutdown.await {
             eprintln!("server error: {}", e);
         }
+
+        Ok(())
     }
 }
 
 async fn shutdown_signal() {
-    // Wait for the CTRL+C signal
     tokio::signal::ctrl_c()
         .await
         .expect("failed to install CTRL+C signal handler");

@@ -15,16 +15,26 @@ impl Database {
         }
     }
 
-    fn get_conn(&self) -> PgConnection {
-        PgConnection::establish(&self.uri)
-            .expect(&format!("Error connecting to database {}", self.uri))
+    pub fn run_migrations(&self) -> Result<(), Box<dyn std::error::Error>> {
+        let conn = self.get_conn()?;
+        embed_migrations!();
+        embedded_migrations::run(&conn)?;
+        Ok(())
     }
 
-    pub async fn insert(&self, new_node: models::NewNode) -> models::Node {
-        println!("Insert: {:?}", new_node);
-        diesel::insert_into(schema::nodes::table)
+    pub fn get_conn(&self) -> Result<PgConnection, diesel::ConnectionError> {
+        let conn = PgConnection::establish(&self.uri)?;
+        Ok(conn)
+    }
+
+    pub async fn insert(
+        &self,
+        new_node: models::NewNode,
+    ) -> Result<models::Node, Box<dyn std::error::Error>> {
+        let conn = self.get_conn()?;
+        let node = diesel::insert_into(schema::nodes::table)
             .values(&new_node)
-            .get_result(&self.get_conn())
-            .expect("Error saving new node")
+            .get_result(&conn)?;
+        Ok(node)
     }
 }
