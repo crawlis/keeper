@@ -11,7 +11,6 @@ pub async fn routes(
             let mut response = Response::new(Body::empty());
             let body = hyper::body::to_bytes(req.into_body()).await?;
             if let Ok(node) = serde_json::from_slice(&body) as Result<NewNode, _> {
-                println!("Inserting: {:?}", node);
                 if let Ok(node) = database.insert(node).await {
                     if let Ok(node) = serde_json::to_string(&node) {
                         *response.status_mut() = StatusCode::OK;
