@@ -17,8 +17,9 @@ dotenv = "0.15"
 futures = "0.3"
 hyper = "0.13"
 openssl = "0.10"
-# We need vendored openssl-sys for cross compilation
-openssl-sys = { version = "0.9", features = ["vendored"]}
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = { version = "0.2", features = ["full"] }
+
+[[bin]]
+name = "keeper"
