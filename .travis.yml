@@ -72,7 +72,6 @@ before_script:
 
 script:
   - cargo build --target ${TARGET} --verbose
-  - cargo test --target ${TARGET} --verbose
 
 after_script:
   - set +e
