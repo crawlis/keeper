@@ -1,11 +1,3 @@
-extern crate openssl;
-#[macro_use]
-extern crate diesel;
-#[macro_use]
-extern crate diesel_migrations;
-
-mod keeper;
-
 use dotenv::dotenv;
 use keeper::{Keeper, KeeperConfig};
 use std::env;

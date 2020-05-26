@@ -1,5 +1,8 @@
-mod persistence;
-mod routing;
+extern crate openssl;
+#[macro_use]
+extern crate diesel;
+#[macro_use]
+extern crate diesel_migrations;
 
 use hyper::service::{make_service_fn, service_fn};
 use hyper::Server;
@@ -7,6 +10,9 @@ use persistence::database::Database;
 use std::error::Error;
 use std::net::SocketAddr;
 use std::time;
+
+mod persistence;
+mod routing;
 
 pub struct KeeperConfig {
     server_port: u16,
