@@ -14,7 +14,7 @@ FROM ubuntu:xenial as builder
 # Update packages and prepare build
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
-    && apt-get install -y curl pkg-config libssl-dev musl-tools fakeroot \
+    && apt-get install -y curl pkg-config libssl-dev libpq-dev musl-tools fakeroot \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
@@ -35,6 +35,9 @@ RUN rm src/*.rs && \
 # Install the binary
 COPY ./src ./src
 RUN cargo build --target x86_64-unknown-linux-musl
+RUN mkdir /build-out \
+    && cp /build/keeper/target/x86_64-unknown-linux-musl/debug/keeper /build-out \
+    && chmod +x /build-out/keeper
 
 
 ##################################################
