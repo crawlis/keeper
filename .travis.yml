@@ -12,8 +12,8 @@ addons: &linux_addons
       - pkg-config
       - libssl-dev
       # needed for musl targets
+      - musl
       - musl-tools
-      - musl-libc
       # needed to build deb packages
       - fakeroot
 
