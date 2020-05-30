@@ -63,16 +63,15 @@ jobs:
 
 before_install:
   - rustup self update
-  - cargo install --version=0.1.16 cross
 
-#install:
-#  - rustup target add ${TARGET}
+install:
+  - rustup target add ${TARGET}
 
 before_script:
   - set -e
 
 script:
-  - cross build --target ${TARGET} --verbose
+  - cargo build --target ${TARGET} --verbose
 
 after_script:
   - set +e
