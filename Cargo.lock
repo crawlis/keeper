@@ -326,6 +326,7 @@ dependencies = [
  "futures",
  "hyper",
  "openssl",
+ "openssl-sys",
  "serde",
  "serde_json",
  "tokio",
