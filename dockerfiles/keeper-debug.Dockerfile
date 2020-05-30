@@ -2,7 +2,7 @@
 #   - Reduce the build time: non-project binaries are cached
 #   - Reduce the image space: the project is installed as a binary runnable from scratch image
 
-ARG BASE_IMAGE=ekidd/rust-musl-builder:latest
+ARG BASE_IMAGE=ekidd/rust-musl-builder
 
 ##################################################
 #                                                #
