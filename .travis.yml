@@ -3,6 +3,7 @@ language: rust
 env:
   global:
     - MODULE_NAME=keeper
+    - PKG_CONFIG_ALLOW_CROSS=1
 
 os: linux
 dist: xenial
