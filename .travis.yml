@@ -13,6 +13,7 @@ addons: &linux_addons
       - pkg-config
       - libssl-dev
       # needed for musl targets
+      - musl-dev
       - musl-tools
       # needed to build deb packages
       - fakeroot
@@ -67,6 +68,7 @@ before_install:
 
 install:
   - rustup target add ${TARGET}
+  - ci/build_openssl_musl.sh
 
 before_script:
   - set -e
