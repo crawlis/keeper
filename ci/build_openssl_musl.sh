@@ -17,4 +17,3 @@ env C_INCLUDE_PATH=/usr/local/musl/include/ make
 sudo make install
 sudo rm /usr/local/musl/include/linux /usr/local/musl/include/asm /usr/local/musl/include/asm-generic
 popd
-rm -r /tmp/*
