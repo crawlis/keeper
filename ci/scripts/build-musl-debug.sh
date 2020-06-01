@@ -11,7 +11,7 @@
 # them unchanged on any distro, including tiny distros like Alpine (which
 # is heavily used for Docker containers).
 
-mkdir -p ./target/x86_64-unknown-linux-musl/debug/
+mkdir -p ./target/x86_64-unknown-linux-musl/debug
 
 docker build -t "$1"-debug -f ./ci/dockerfiles/musl-builder-debug.Dockerfile .
 docker run -it --name "$1" "$1"-debug
