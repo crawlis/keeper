@@ -53,15 +53,15 @@ before_script:
   - set -e
 
 script:
-  - ci/scripts/build-debug.sh
-  - ci/scripts/test-debug.sh
+  - ci/scripts/build-debug.sh ${MODULE_NAME}
+  - ci/scripts/test-debug.sh ${MODULE_NAME}
 
 after_script:
   - set +e
 
 before_deploy:
-  - ci/scripts/build-release.sh
-  - ci/scripts/test-release.sh
+  - ci/scripts/build-release.sh ${MODULE_NAME}
+  - ci/scripts/test-release.sh ${MODULE_NAME}
   - mkdir -p target/executable
   - cp target/${TARGET}/debug/${MODULE_NAME} target/executable/${MODULE_NAME}-${TRAVIS_TAG}-${TARGET}-debug
   - cp target/${TARGET}/release/${MODULE_NAME} target/executable/${MODULE_NAME}-${TRAVIS_TAG}-${TARGET}
