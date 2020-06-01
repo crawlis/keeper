@@ -3,7 +3,7 @@
 
 # Usage: ./musl-build-release.sh <MODULE_NAME>
 #
-# Most of this script comes from:
+# Most parts of this script are comming from:
 # https://github.com/emk/rust-musl-builder/blob/master/examples/build-release
 #
 # Called by `.travis.yml` to build release binaries. We use
