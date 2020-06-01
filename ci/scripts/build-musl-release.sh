@@ -11,7 +11,7 @@
 # them unchanged on any distro, including tiny distros like Alpine (which
 # is heavily used for Docker containers).
 
-mkdir ./target/x86_64-unknown-linux-musl/release
+mkdir -p ./target/x86_64-unknown-linux-musl/release
 
 docker build -t "$1"-release -f ./ci/dockerfiles/musl-builder-release.Dockerfile .
 docker run -it --name "$1" "$1"-release
