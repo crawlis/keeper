@@ -3,20 +3,6 @@ language: rust
 env:
   global:
     - MODULE_NAME=keeper
-    - PKG_CONFIG_ALLOW_CROSS=1
-
-os: linux
-dist: xenial
-addons: &linux_addons
-  apt:
-    packages:
-      - pkg-config
-      - libssl-dev
-      # needed for musl targets
-      - musl-dev
-      - musl-tools
-      # needed to build deb packages
-      - fakeroot
 
 jobs:
   fast_finish: true
@@ -27,12 +13,10 @@ jobs:
       os: linux
       dist: xenial
       env: TARGET=x86_64-unknown-linux-gnu
-      addons: *linux_addons
     - rust: stable
       os: linux
       dist: xenial
       env: TARGET=x86_64-unknown-linux-musl
-      addons: *linux_addons
     - rust: stable
       os: osx
       env: TARGET=x86_64-apple-darwin
@@ -40,12 +24,10 @@ jobs:
       os: linux
       dist: xenial
       env: TARGET=x86_64-unknown-linux-gnu
-      addons: *linux_addons
     - rust: beta
       os: linux
       dist: xenial
       env: TARGET=x86_64-unknown-linux-musl
-      addons: *linux_addons
     - rust: beta
       os: osx
       env: TARGET=x86_64-apple-darwin
@@ -53,35 +35,24 @@ jobs:
       os: linux
       dist: xenial
       env: TARGET=x86_64-unknown-linux-gnu
-      addons: *linux_addons
     - rust: nightly
       os: linux
       dist: xenial
       env: TARGET=x86_64-unknown-linux-musl
-      addons: *linux_addons
     - rust: nightly
       os: osx
       env: TARGET=x86_64-apple-darwin
-
-before_install:
-  - rustup self update
 
 install:
-  - rustup target add ${TARGET}
-  - ci/build_openssl_musl.sh
-
-before_script:
-  - set -e
+  - ci/scripts/install.sh
 
 script:
-  - cargo build --target ${TARGET} --verbose
-
-after_script:
-  - set +e
+  - ci/build-debug.sh
+  - ci/test-debug.sh
 
 before_deploy:
-  - cargo build --target ${TARGET} --verbose --release
-  - cargo test --target ${TARGET} --verbose --release
+  - ci/build-release.sh
+  - ci/test-release.sh
   - mkdir -p target/executable
   - cp target/${TARGET}/debug/${MODULE_NAME} target/executable/${MODULE_NAME}-${TRAVIS_TAG}-${TARGET}-debug
   - cp target/${TARGET}/release/${MODULE_NAME} target/executable/${MODULE_NAME}-${TRAVIS_TAG}-${TARGET}
