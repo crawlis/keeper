@@ -2,7 +2,7 @@
 
 if [ $TARGET == "x86_64-unknown-linux-musl" ]
 then
-  ./test-musl-debug.sh
+  .ci/scripts/test-musl-debug.sh "$1"
 else
   cargo test --target ${TARGET} --verbose
 fi

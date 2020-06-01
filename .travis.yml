@@ -49,9 +49,15 @@ jobs:
 install:
   - ci/scripts/install.sh
 
+before_script:
+  - set -e
+
 script:
   - ci/scripts/build-debug.sh
   - ci/scripts/test-debug.sh
+
+after_script:
+  - set +e
 
 before_deploy:
   - ci/scripts/build-release.sh

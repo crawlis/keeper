@@ -11,7 +11,7 @@
 # them unchanged on any distro, including tiny distros like Alpine (which
 # is heavily used for Docker containers).
 
-docker build -t "$1"-release -f ci/dockerfiles/musl-tester-release.Dockerfile .
+docker build -t "$1"-release -f ./ci/dockerfiles/musl-tester-release.Dockerfile .
 docker run -it --name "$1" "$1"-release
 docker rm "$1"
 docker rmi "$1"-release

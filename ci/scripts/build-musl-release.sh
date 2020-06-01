@@ -13,7 +13,7 @@
 
 mkdir ./target/x86_64-unknown-linux-musl/release
 
-docker build -t "$1"-release -f ci/dockerfiles/musl-builder-release.Dockerfile .
+docker build -t "$1"-release -f ./ci/dockerfiles/musl-builder-release.Dockerfile .
 docker run -it --name "$1" "$1"-release
 docker cp "$1":/home/rust/src/target/x86_64-unknown-linux-musl/release/"$1" ./target/x86_64-unknown-linux-musl/release/"$1"
 docker rm "$1"
