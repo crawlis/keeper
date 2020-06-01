@@ -1,5 +1,8 @@
 language: rust
 
+services:
+  - docker
+
 env:
   global:
     - MODULE_NAME=keeper
