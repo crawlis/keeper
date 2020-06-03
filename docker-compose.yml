@@ -3,7 +3,7 @@ services:
   crawler:
     build:
       context: .
-      dockerfile: ./dockerfiles/module-debug.Dockerfile
+      dockerfile: ./dockerfiles/generic-module-debug.Dockerfile
       args:
         - MODULE_NAME=crawler
         - MODULE_TAG=v0.0.1
@@ -19,7 +19,7 @@ services:
   keeper:
     build:
       context: .
-      dockerfile: ./dockerfiles/keeper-debug.Dockerfile
+      dockerfile: ./dockerfiles/local-module-debug.Dockerfile
     env_file: .env
     environment:
       - DATABASE_URL=postgresql://postgres:password@postgres-db/keeper

@@ -18,4 +18,3 @@ docker run -it --name "$1" "$1"-debug
 docker cp "$1":/home/rust/src/target/x86_64-unknown-linux-musl/debug/"$1" ./target/x86_64-unknown-linux-musl/debug/"$1"
 docker rm "$1"
 docker rmi "$1"-debug
-       
