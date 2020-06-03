@@ -14,19 +14,13 @@ FROM ekidd/rust-musl-builder as builder
 RUN rustup self update
 RUN rustup target add x86_64-unknown-linux-musl
 
-# Create a new empty shell project to cache dependencies
-RUN USER=root cargo new --bin --vcs none keeper
+RUN mkdir keeper
 WORKDIR /home/rust/src/keeper
 COPY ./Cargo.toml ./Cargo.toml
 COPY ./Cargo.lock ./Cargo.lock
-RUN cargo build --target x86_64-unknown-linux-musl
-RUN rm src/*.rs && \
-    rm -rf ./target/x86_64-unknown-linux-musl/debug/deps/keeper*
-
-# Install the binary
 COPY ./src ./src
 RUN cargo build --target x86_64-unknown-linux-musl
-RUN chmod +x ./target/x86_64-unknown-linux-musl/debug/keeper
+RUN chmod +x ./target/x86_64-unknown-linux-musl/release/keeper
 
 ##################################################
 #                                                #
@@ -38,7 +32,7 @@ RUN chmod +x ./target/x86_64-unknown-linux-musl/debug/keeper
 FROM scratch
 
 # Adding the binary
-COPY --from=builder /home/rust/src/keeper/target/x86_64-unknown-linux-musl/debug/keeper .
+COPY --from=builder /home/rust/src/keeper/target/x86_64-unknown-linux-musl/release/keeper .
 
 # Adding SSL certificates
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
