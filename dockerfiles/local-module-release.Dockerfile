@@ -5,6 +5,8 @@
 #   - Run it in release mode                     #
 #                                                #
 ##################################################
+
+
 # This is a development dockerfile optimized to :
 #   - Reduce the build time: non-project binaries are cached
 #   - Reduce the image space: the project is installed as a binary runnable from scratch image
@@ -18,16 +20,18 @@
 ##################################################
 FROM ekidd/rust-musl-builder as builder
 
+ARG MODULE_NAME=keeper
+
 RUN rustup self update
 RUN rustup target add x86_64-unknown-linux-musl
 
-RUN mkdir keeper
-WORKDIR /home/rust/src/keeper
+RUN mkdir ${MODULE_NAME}
+WORKDIR /home/rust/src/${MODULE_NAME}
 COPY ./Cargo.toml ./Cargo.toml
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./src ./src
 RUN cargo build --target x86_64-unknown-linux-musl --release
-RUN chmod +x ./target/x86_64-unknown-linux-musl/release/keeper
+RUN chmod +x ./target/x86_64-unknown-linux-musl/release/${MODULE_NAME}
 
 ##################################################
 #                                                #
@@ -38,11 +42,13 @@ RUN chmod +x ./target/x86_64-unknown-linux-musl/release/keeper
 ##################################################
 FROM scratch
 
+ARG MODULE_NAME=keeper
+
 # Adding the binary
-COPY --from=builder /home/rust/src/keeper/target/x86_64-unknown-linux-musl/release/keeper .
+COPY --from=builder /home/rust/src/${MODULE_NAME}/target/x86_64-unknown-linux-musl/release/${MODULE_NAME} ./app
 
 # Adding SSL certificates
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 ENV SSL_CERT_DIR=/etc/ssl/certs
-CMD ["./keeper"]
+CMD ["./app"]
