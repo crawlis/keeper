@@ -19,7 +19,7 @@ WORKDIR /home/rust/src/keeper
 COPY ./Cargo.toml ./Cargo.toml
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./src ./src
-RUN cargo build --target x86_64-unknown-linux-musl
+RUN cargo build --target x86_64-unknown-linux-musl --release
 RUN chmod +x ./target/x86_64-unknown-linux-musl/release/keeper
 
 ##################################################
