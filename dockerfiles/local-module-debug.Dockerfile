@@ -1,3 +1,11 @@
+##################################################
+#                                                #
+# THIS IMAGE SHOULD BE USED TO:                  #
+#   - Run the microservice you are developping   #
+#   - Run it in debug mode                       #
+#                                                #
+##################################################
+
 # This is a development dockerfile optimized to :
 #   - Reduce the build time: non-project binaries are cached
 #   - Reduce the image space: the project is installed as a binary runnable from scratch image
@@ -14,13 +22,19 @@ FROM ekidd/rust-musl-builder as builder
 RUN rustup self update
 RUN rustup target add x86_64-unknown-linux-musl
 
-RUN mkdir keeper
+# Create a new empty shell project to cache dependencies
+RUN USER=root cargo new --bin --vcs none keeper
 WORKDIR /home/rust/src/keeper
 COPY ./Cargo.toml ./Cargo.toml
 COPY ./Cargo.lock ./Cargo.lock
+RUN cargo build --target x86_64-unknown-linux-musl
+RUN rm src/*.rs && \
+    rm -rf ./target/x86_64-unknown-linux-musl/debug/deps/keeper*
+
+# Install the binary
 COPY ./src ./src
-RUN cargo build --target x86_64-unknown-linux-musl --release
-RUN chmod +x ./target/x86_64-unknown-linux-musl/release/keeper
+RUN cargo build --target x86_64-unknown-linux-musl
+RUN chmod +x ./target/x86_64-unknown-linux-musl/debug/keeper
 
 ##################################################
 #                                                #
@@ -32,7 +46,7 @@ RUN chmod +x ./target/x86_64-unknown-linux-musl/release/keeper
 FROM scratch
 
 # Adding the binary
-COPY --from=builder /home/rust/src/keeper/target/x86_64-unknown-linux-musl/release/keeper .
+COPY --from=builder /home/rust/src/keeper/target/x86_64-unknown-linux-musl/debug/keeper .
 
 # Adding SSL certificates
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
