@@ -14,9 +14,10 @@ opt-level = 3
 diesel = { version = "1.4", features = ["postgres"] }
 diesel_migrations = "1.4"
 dotenv = "0.15"
-futures = "0.3"
-hyper = "0.13"
+natsio = "0.3"
 openssl =  "0.10"
-serde = { version = "1.0", features = ["derive"] }
+serde = "1.0"
+serde_derive = "1.0"
 serde_json = "1.0"
 tokio = { version = "0.2", features = ["full"] }
+url = "2.1"

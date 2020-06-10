@@ -1,8 +1,9 @@
 use dotenv::dotenv;
-use keeper::{Keeper, KeeperConfig};
+use keeper::keeper::{Keeper, KeeperConfig};
 use std::env;
 use std::error::Error;
 use std::process;
+use url::Url;
 
 #[tokio::main]
 async fn main() {
@@ -12,8 +13,11 @@ async fn main() {
         eprintln!("Problem initializing keeper config: {}", err);
         process::exit(1);
     });
+    let keeper = Keeper::new(config).unwrap_or_else(|err| {
+        eprintln!("Problem initializing keeper: {}", err);
+        process::exit(1);
+    });
 
-    let keeper = Keeper::new(config);
     keeper.run().await.unwrap_or_else(|err| {
         eprintln!("Problem running the keeper: {}", err);
         panic!("Terminating");
@@ -21,10 +25,18 @@ async fn main() {
 }
 
 fn get_config() -> Result<KeeperConfig, Box<dyn Error>> {
-    let server_port = env::var("SERVER_PORT")?;
-    let server_port = server_port.parse::<u16>()?;
-    let db_url = env::var("DATABASE_URL")?;
+    let nats_uri = env::var("NATS_URI")?;
+    let nats_uri = Url::parse(&nats_uri)?;
 
-    let config = KeeperConfig::new(server_port, db_url);
+    let nats_subject = String::from("node");
+
+    let database_uri = env::var("DATABASE_URI")?;
+    let database_uri = Url::parse(&database_uri)?;
+
+    let config = KeeperConfig::new(
+        nats_uri.into_string(),
+        nats_subject,
+        database_uri.into_string(),
+    );
     Ok(config)
 }
