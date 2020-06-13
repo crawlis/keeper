@@ -20,7 +20,7 @@ async fn main() {
 
     keeper.run().await.unwrap_or_else(|err| {
         eprintln!("Problem running the keeper: {}", err);
-        panic!("Terminating");
+        process::exit(1);
     });
 }
 
