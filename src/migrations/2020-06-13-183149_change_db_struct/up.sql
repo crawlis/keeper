@@ -11,3 +11,13 @@ CREATE TABLE parents (
     parent VARCHAR NOT NULL,
     node VARCHAR NOT NULL
 );
+
+ALTER TABLE
+    nodes
+add
+    constraint "unique_node_name" unique ("node");
+
+ALTER TABLE
+    parents
+add
+    constraint "unique_parent_name" unique ("parent", "node");

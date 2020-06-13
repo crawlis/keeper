@@ -57,38 +57,40 @@ impl Database {
         ))
     }
 
-    pub async fn insert_parents(
+    pub async fn insert_parent(
         &self,
         conn: &PgConnection,
-        new_parents: Vec<models::ParentForm>,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        diesel::insert_into(schema::parents::table)
-            .values(&new_parents)
-            .get_results::<models::Parent>(conn)?;
-        Ok(())
+        parent_form: models::ParentForm,
+    ) -> QueryResult<models::Parent> {
+        use schema::parents::dsl::*;
+        diesel::insert_into(parents)
+            .values(&parent_form)
+            .on_conflict_do_nothing()
+            .get_result::<models::Parent>(conn)
     }
 
-    pub async fn insert_nodes(
+    pub async fn insert_node(
         &self,
         conn: &PgConnection,
-        new_nodes: Vec<models::NodeForm>,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        diesel::insert_into(schema::nodes::table)
-            .values(&new_nodes)
-            .get_results::<models::Node>(conn)?;
-        Ok(())
+        node_form: models::NodeForm,
+    ) -> QueryResult<models::Node> {
+        use schema::nodes::dsl::*;
+        diesel::insert_into(nodes)
+            .values(&node_form)
+            .on_conflict_do_nothing()
+            .get_result::<models::Node>(conn)
     }
 
     pub async fn update_node(
         &self,
         conn: &PgConnection,
-        updated_node: models::NodeForm,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+        node_name: &str,
+        node_form: models::NodeForm,
+    ) -> QueryResult<models::Node> {
         use schema::nodes::dsl::*;
-        let target = nodes.filter(node.eq(&updated_node.node));
+        let target = nodes.filter(node.eq(node_name));
         diesel::update(target)
-            .set(&updated_node)
-            .get_result::<models::Node>(conn)?;
-        Ok(())
+            .set(&node_form)
+            .get_result::<models::Node>(conn)
     }
 }

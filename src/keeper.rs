@@ -1,8 +1,11 @@
 use crate::nats::NatsSubscriber;
 use crate::persistence::database;
 use crate::persistence::models;
+use diesel::prelude::QueryResult;
 use serde::Deserialize;
 use std::error::Error;
+use std::future::Future;
+use std::pin::Pin;
 use std::time;
 
 pub struct KeeperConfig {
@@ -71,37 +74,45 @@ impl Keeper {
         // We get a fresh database connexion
         let database_conn = self.database.get_conn()?;
         // We persist the fresh nodes as not "visited"
-        let new_nodes: Vec<models::NodeForm> = crawling_results
-            .urls
-            .iter()
-            .map(|url| models::NodeForm {
-                node: String::from(url),
-                visited: false,
-            })
-            .collect();
-        self.database
-            .insert_nodes(&database_conn, new_nodes)
-            .await?;
+        let new_nodes: Vec<Pin<Box<dyn Future<Output = QueryResult<models::Node>>>>> =
+            crawling_results
+                .urls
+                .iter()
+                .map(|url| models::NodeForm {
+                    node: String::from(url),
+                    visited: false,
+                })
+                .map(
+                    |node_form| -> Pin<Box<dyn Future<Output = QueryResult<models::Node>>>> {
+                        Box::pin(self.database.insert_node(&database_conn, node_form))
+                    },
+                )
+                .collect();
+        futures::future::join_all(new_nodes).await;
         // We set the parent to "visited"
         let visited_node = models::NodeForm {
             node: crawling_results.parent.clone(),
             visited: true,
         };
         self.database
-            .update_node(&database_conn, visited_node)
+            .update_node(&database_conn, &crawling_results.parent, visited_node)
             .await?;
         // We add the fresh nodes parent relations
-        let new_parents: Vec<models::ParentForm> = crawling_results
-            .urls
-            .iter()
-            .map(|url| models::ParentForm {
-                parent: crawling_results.parent.clone(),
-                node: String::from(url),
-            })
-            .collect();
-        self.database
-            .insert_parents(&database_conn, new_parents)
-            .await?;
+        let new_parents: Vec<Pin<Box<dyn Future<Output = QueryResult<models::Parent>>>>> =
+            crawling_results
+                .urls
+                .iter()
+                .map(|url| models::ParentForm {
+                    parent: crawling_results.parent.clone(),
+                    node: String::from(url),
+                })
+                .map(
+                    |parent_form| -> Pin<Box<dyn Future<Output = QueryResult<models::Parent>>>> {
+                        Box::pin(self.database.insert_parent(&database_conn, parent_form))
+                    },
+                )
+                .collect();
+        futures::future::join_all(new_parents).await;
         Ok(())
     }
 }
