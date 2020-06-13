@@ -1,0 +1,13 @@
+DROP TABLE nodes;
+
+CREATE TABLE nodes (
+    id SERIAL PRIMARY KEY,
+    node VARCHAR NOT NULL,
+    visited BOOL NOT NULL
+);
+
+CREATE TABLE parents (
+    id SERIAL PRIMARY KEY,
+    parent VARCHAR NOT NULL,
+    node VARCHAR NOT NULL
+);

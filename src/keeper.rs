@@ -68,15 +68,41 @@ impl Keeper {
         &self,
         crawling_results: CrawlingResults,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let new_nodes: Vec<models::NewNode> = crawling_results
+        // We get a fresh database connexion
+        let database_conn = self.database.get_conn()?;
+        // We persist the fresh nodes as not "visited"
+        let new_nodes: Vec<models::NodeForm> = crawling_results
             .urls
             .iter()
-            .map(|url| models::NewNode {
-                parent: crawling_results.parent.clone(),
-                value: String::from(url),
+            .map(|url| models::NodeForm {
+                node: String::from(url),
+                visited: false,
             })
             .collect();
-        self.database.insert_nodes(new_nodes).await
+        self.database
+            .insert_nodes(&database_conn, new_nodes)
+            .await?;
+        // We set the parent to "visited"
+        let visited_node = models::NodeForm {
+            node: crawling_results.parent.clone(),
+            visited: true,
+        };
+        self.database
+            .update_node(&database_conn, visited_node)
+            .await?;
+        // We add the fresh nodes parent relations
+        let new_parents: Vec<models::ParentForm> = crawling_results
+            .urls
+            .iter()
+            .map(|url| models::ParentForm {
+                parent: crawling_results.parent.clone(),
+                node: String::from(url),
+            })
+            .collect();
+        self.database
+            .insert_parents(&database_conn, new_parents)
+            .await?;
+        Ok(())
     }
 }
 

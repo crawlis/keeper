@@ -57,22 +57,38 @@ impl Database {
         ))
     }
 
-    pub async fn insert_nodes(
+    pub async fn insert_parents(
         &self,
-        new_nodes: Vec<models::NewNode>,
+        conn: &PgConnection,
+        new_parents: Vec<models::ParentForm>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let conn = self.get_conn()?;
-        diesel::insert_into(schema::nodes::table)
-            .values(&new_nodes)
-            .get_results::<models::Node>(&conn)?;
+        diesel::insert_into(schema::parents::table)
+            .values(&new_parents)
+            .get_results::<models::Parent>(conn)?;
         Ok(())
     }
 
-    pub async fn insert_node(
+    pub async fn insert_nodes(
         &self,
-        new_node: models::NewNode,
+        conn: &PgConnection,
+        new_nodes: Vec<models::NodeForm>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        self.insert_nodes(vec![new_node]).await?;
+        diesel::insert_into(schema::nodes::table)
+            .values(&new_nodes)
+            .get_results::<models::Node>(conn)?;
+        Ok(())
+    }
+
+    pub async fn update_node(
+        &self,
+        conn: &PgConnection,
+        updated_node: models::NodeForm,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        use schema::nodes::dsl::*;
+        let target = nodes.filter(node.eq(&updated_node.node));
+        diesel::update(target)
+            .set(&updated_node)
+            .get_result::<models::Node>(conn)?;
         Ok(())
     }
 }

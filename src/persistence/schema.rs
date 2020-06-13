@@ -1,7 +1,14 @@
 table! {
-    nodes (id) {
+    parents (id) {
         id -> Int4,
         parent -> Varchar,
-        value -> Varchar,
+        node -> Varchar,
+    }
+}
+table! {
+    nodes (id) {
+        id -> Int4,
+        node -> Varchar,
+        visited -> Bool,
     }
 }
