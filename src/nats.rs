@@ -6,7 +6,8 @@ pub struct NatsSubscriber {
 impl NatsSubscriber {
     pub fn new(uri: &str, subject: &str) -> Result<NatsSubscriber, std::io::Error> {
         let conn = nats::connect(uri)?;
-        let sub = conn.queue_subscribe(subject, "keeper")?;
+        let sub = format!("{}.*", subject);
+        let sub = conn.queue_subscribe(&sub, "keeper")?;
         Ok(NatsSubscriber { conn, sub })
     }
     pub fn get_next_message(&self) -> Option<nats::Message> {

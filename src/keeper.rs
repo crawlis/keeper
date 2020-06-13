@@ -1,7 +1,6 @@
 use crate::nats::NatsSubscriber;
 use crate::persistence::database;
 use crate::persistence::models;
-use futures::TryFutureExt;
 use serde::Deserialize;
 use std::error::Error;
 use std::time;
@@ -54,7 +53,7 @@ impl Keeper {
                 match serde_json::from_slice::<CrawlingResults>(&message.data) {
                     Ok(crawling_results) => {
                         if let Err(err) = self.persist_crawling_results(crawling_results).await {
-                            eprintln!("Could not persist nodes: {}", err)
+                            eprintln!("Could not persist nodes: {}", err);
                         };
                     }
                     Err(err) => eprintln!("Could not deserialize message: {}", err),
