@@ -4,7 +4,7 @@ pub struct NatsSubscriber {
 }
 
 impl NatsSubscriber {
-    pub fn new(uri: &str, subject: &str) -> Result<NatsSubscriber, std::io::Error> {
+    pub fn new(uri: &str, subject: &str) -> std::io::Result<NatsSubscriber> {
         let conn = nats::connect(uri)?;
         let sub = format!("{}.*", subject);
         let sub = conn.queue_subscribe(&sub, "keeper")?;
@@ -13,7 +13,7 @@ impl NatsSubscriber {
     pub fn get_next_message(&self) -> Option<nats::Message> {
         self.sub.try_next()
     }
-    pub fn close(self) -> Result<(), std::io::Error> {
+    pub fn close(self) {
         self.conn.close()
     }
 }

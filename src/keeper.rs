@@ -5,6 +5,7 @@ use diesel::prelude::QueryResult;
 use serde::Deserialize;
 use std::error::Error;
 use std::future::Future;
+use std::io;
 use std::pin::Pin;
 use std::time;
 
@@ -35,7 +36,7 @@ pub struct Keeper {
 }
 
 impl Keeper {
-    pub fn new(config: KeeperConfig) -> Result<Keeper, std::io::Error> {
+    pub fn new(config: KeeperConfig) -> io::Result<Keeper> {
         let nats_subscriber =
             NatsSubscriber::new(&config.nats_subscriber_uri, &config.nats_subscriber_subject)?;
         let database = database::Database::new(&config.database_uri);
@@ -63,8 +64,6 @@ impl Keeper {
                 }
             }
         }
-
-        Ok(())
     }
 
     async fn persist_crawling_results(
@@ -94,9 +93,17 @@ impl Keeper {
             node: crawling_results.parent.clone(),
             visited: true,
         };
-        self.database
-            .update_node(&database_conn, &crawling_results.parent, visited_node)
-            .await?;
+        if let Err(err) = self
+            .database
+            .update_node(&database_conn, &crawling_results.parent, &visited_node)
+            .await
+        {
+            if err == diesel::result::Error::NotFound {
+                self.database
+                    .insert_node(&database_conn, visited_node)
+                    .await?;
+            }
+        }
         // We add the fresh nodes parent relations
         let new_parents: Vec<Pin<Box<dyn Future<Output = QueryResult<models::Parent>>>>> =
             crawling_results

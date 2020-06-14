@@ -64,7 +64,7 @@ impl Database {
     ) -> QueryResult<models::Parent> {
         use schema::parents::dsl::*;
         diesel::insert_into(parents)
-            .values(&parent_form)
+            .values(parent_form)
             .on_conflict_do_nothing()
             .get_result::<models::Parent>(conn)
     }
@@ -85,12 +85,12 @@ impl Database {
         &self,
         conn: &PgConnection,
         node_name: &str,
-        node_form: models::NodeForm,
+        node_form: &models::NodeForm,
     ) -> QueryResult<models::Node> {
         use schema::nodes::dsl::*;
         let target = nodes.filter(node.eq(node_name));
         diesel::update(target)
-            .set(&node_form)
+            .set(node_form)
             .get_result::<models::Node>(conn)
     }
 }
