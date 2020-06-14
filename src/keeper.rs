@@ -64,8 +64,6 @@ impl Keeper {
                 }
             }
         }
-
-        Ok(())
     }
 
     async fn persist_crawling_results(
@@ -95,9 +93,17 @@ impl Keeper {
             node: crawling_results.parent.clone(),
             visited: true,
         };
-        self.database
-            .update_node(&database_conn, &crawling_results.parent, visited_node)
-            .await?;
+        if let Err(err) = self
+            .database
+            .update_node(&database_conn, &crawling_results.parent, &visited_node)
+            .await
+        {
+            if err == diesel::result::Error::NotFound {
+                self.database
+                    .insert_node(&database_conn, visited_node)
+                    .await?;
+            }
+        }
         // We add the fresh nodes parent relations
         let new_parents: Vec<Pin<Box<dyn Future<Output = QueryResult<models::Parent>>>>> =
             crawling_results
