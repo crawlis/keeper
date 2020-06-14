@@ -15,7 +15,7 @@ diesel = { version = "1.4", features = ["postgres"] }
 diesel_migrations = "1.4"
 dotenv = "0.15"
 futures = "0.3"
-natsio = "0.3"
+nats = "0.5"
 openssl =  "0.10"
 serde = "1.0"
 serde_derive = "1.0"

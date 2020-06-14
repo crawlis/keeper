@@ -5,6 +5,7 @@ use diesel::prelude::QueryResult;
 use serde::Deserialize;
 use std::error::Error;
 use std::future::Future;
+use std::io;
 use std::pin::Pin;
 use std::time;
 
@@ -35,7 +36,7 @@ pub struct Keeper {
 }
 
 impl Keeper {
-    pub fn new(config: KeeperConfig) -> Result<Keeper, std::io::Error> {
+    pub fn new(config: KeeperConfig) -> io::Result<Keeper> {
         let nats_subscriber =
             NatsSubscriber::new(&config.nats_subscriber_uri, &config.nats_subscriber_subject)?;
         let database = database::Database::new(&config.database_uri);
