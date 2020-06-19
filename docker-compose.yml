@@ -39,6 +39,7 @@ services:
       - STARTING_URL=https://lemonde.fr
     depends_on:
       - nats
+      - database
 
   nats:
     image: "nats"
