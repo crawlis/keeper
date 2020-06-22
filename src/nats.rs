@@ -11,7 +11,7 @@ impl NatsSubscriber {
         Ok(NatsSubscriber { conn, sub })
     }
     pub fn get_next_message(&self) -> Option<nats::Message> {
-        self.sub.try_next()
+        self.sub.next()
     }
     pub fn close(self) {
         self.conn.close()
